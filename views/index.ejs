@@ -9,43 +9,42 @@
     <link href="./css/styles.css" rel="stylesheet"> 
     <title>TO-DO Manager</title>
     <script>
-        var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
-        function updateTodo(id)
-        {
-            // console.log('/todos/${id}/markAsCompleted');
-            fetch(`/todos/${id}/markAsCompleted`, {
-                method: "put",
-                Headers: {
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify({
-                    "_csrf":token
-                })
-
-            })
-            .then((res) =>
-            {
-                window.location.reload();
-            })
-            .catch((err) => console.error(err));
-        }
-
-        function deleteTodo(id)
-        {
-            fetch(`/todos/${id}`,{
-                method:"delete",
-                headers: {"Content-Type":"application/json"},
-                body: JSON.stringify({
-                    "_csrf":token
-                })
-            })
-            .then((res) => {
-                if(res.ok){
-                    window.location.reload();
-                }
-            })
-            .catch((err)=>console.error(err))
-        }
+      var token = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
+      const updateTodo = (id) => {
+        const bool = document.querySelector(`#checkbox-${id}`).checked;
+        console.log(bool);
+        fetch(`/todos/${id}`, {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            _csrf: token,
+            completed: bool,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              window.location.reload();
+            }
+          })
+          .catch((err) => console.erroe(err));
+      };
+      function deleteTodo(id) {
+        fetch(`/todos/${id}`, {
+          method: "delete",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            _csrf: token,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              window.location.reload();
+            }
+          })
+          .catch((err) => console.erroe(err));
+      }
     </script>
 </head>
 <body>
