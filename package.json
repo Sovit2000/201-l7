@@ -15,7 +15,6 @@
       "prettier --write ."
     ]
   },
-  "keywords": [],
   "author": " sovit chaudhary <sovit.202104006@tulas.edu.in>",
   "license": "ISC",
   "dependencies": {
