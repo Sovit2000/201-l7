@@ -1,13 +1,13 @@
-/* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
 var csrf = require("tiny-csrf");
+
 const bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
-
 app.use(bodyParser.json());
 const path = require("path");
 const { Todo } = require("./models");
+
 // eslint-disable-next-line no-unused-vars
 const todo = require("./models/todo");
 
