@@ -10,7 +10,10 @@ const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
+const bcrypt = require('bcrypt');
 
+
+const saltRounds = 10;
 app.use(bodyParser.json());
 
 // seting the ejs is the engine
@@ -41,8 +44,14 @@ passport.use(
       passwordField: "password",
     },
     (username, password, done) => {
-      User.findOne({ where: { email: username, password: password } })
-        .then((user) => {
+      User.findOne({ where: { email: username } })
+        .then(async(user) => {
+          const result = await bcrypt.compare(password, user.password)
+          if(result){
+            return done(null, user);
+          }else{
+            return done("Invalid Password");
+          }
           return done(null, user);
         })
         .catch((error) => {
@@ -107,13 +116,16 @@ app.get("/signup", (request, response) => {
 
 app.post("/users", async (request, response) => {
   console.log("Firstname", request.body.firstName);
+  //Hash password using bcrypt
+  const hashedPwd = await bcrypt.hash(request.body.password, saltRounds)
+  console.log(hashedPwd)
   // Have to create the user here
   try {
     const user = await User.create({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
       email: request.body.email,
-      password: request.body.password,
+      password: hashedPwd
     });
     request.login(user, (err) => {
       if(err){
@@ -130,15 +142,31 @@ app.post("/users", async (request, response) => {
 app.get("/login", (request, response) => {
   response.render("login", {
     title: "Login",
-    csrfToken: request.csrfToken(),
+    csrfToken: request.csrfToken()
   });
-});
+})
+
+app.post("/session", passport.authenticate('local', { failureRedirect: "/login"}), (request, response) => {
+  console.log(request.user);
+  response.redirect("/todos");
+})
+
+//signout page
+app.get("/signout", (request, response, next) => {
+  // SignOut
+  request.logout((err) => {
+    if(err){
+      return next(err);
+    }
+    response.redirect("/");
+  })
+})
 
 app.get("/todos", (request, response) => {
   console.log("Todo List", request.body);
 });
-app.post("/todos", async (request, response) => {
-  console.log("Todo List");
+app.post("/todos", connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+  console.log("Creating a To Do", request.body);
   try {
     console.log("entering in try block");
     const todo = await Todo.addTodo({
@@ -152,7 +180,7 @@ app.post("/todos", async (request, response) => {
   }
 });
 
-app.put("/todos/:id", async (request, response) => {
+app.put("/todos/:id", connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   const todo = await Todo.findByPk(request.params.id);
   try {
     const upTodo = await todo.setCompletionStatus(request.body.completed);
@@ -162,7 +190,8 @@ app.put("/todos/:id", async (request, response) => {
   }
 });
 
-app.delete("/todos/:id", async function (request, response) {
+// eslint-disable-next-line no-unused-vars
+app.delete("/todos/:id", connectEnsureLogin.ensureLoggedIn(), async function (request, response) {
   const deleteFlag = await Todo.destroy({ where: { id: request.params.id } });
   response.send(deleteFlag ? true : false);
 });
