@@ -67,7 +67,7 @@ describe("todo test suits", () => {
     });
     expect(response.statusCode).toBe(302);
   });
-  test("Test update functinality of markAsComplete", async () => {
+  test("Test a markAsComplete functionality", async () => {
     const agent = request.agent(server);
     await login(agent, "suraj123@gmail.com", "12345678");
     const getResponse = await agent.get("/todos");
