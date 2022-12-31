@@ -33,6 +33,8 @@ app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
@@ -147,7 +149,7 @@ app.post("/users", async (request, response) => {
     request.flash("error", " Your password length should be atleast 8");
     return response.redirect("/signup");
   }
-  
+
   console.log("FirstName", request.body.firstName);
   //Hash password using bcrypt
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
@@ -185,7 +187,7 @@ app.post(
     failureRedirect: "/login",
     failureFlash: true,
   }),
-  function(request, response) {
+  function (request, response) {
     console.log(request.user);
     response.redirect("/todos");
   }
