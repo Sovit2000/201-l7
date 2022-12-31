@@ -56,7 +56,7 @@ describe("todo test suits", () => {
 
   test("Test create a new todo", async () => {
     const agent = request.agent(server);
-    await login(agent, "testa123@gmail.com", "12345678");
+    await login(agent, "suraj123@gmail.com", "12345678");
     const getResponse = await agent.get("/todos");
     const csrfToken = fetchCsrfToken(getResponse);
     const response = await agent.post("/todos").send({
@@ -69,7 +69,7 @@ describe("todo test suits", () => {
   });
   test("Test a markAsComplete functionality", async () => {
     const agent = request.agent(server);
-    await login(agent, "testa123@gmail.com", "12345678");
+    await login(agent, "suraj123@gmail.com", "12345678");
     const getResponse = await agent.get("/todos");
     let csrfToken = fetchCsrfToken(getResponse);
     await agent.post("/todos").send({
@@ -97,7 +97,7 @@ describe("todo test suits", () => {
   });
   test("Test the delete functionality", async () => {
     const agent = request.agent(server);
-    await login(agent, "testa123@gmail.com", "12345678");
+    await login(agent, "suraj123@gmail.com", "12345678");
     const getResponse = await agent.get("/todos");
     let csrfToken = fetchCsrfToken(getResponse);
     await agent.post("/todos").send({
@@ -126,7 +126,7 @@ describe("todo test suits", () => {
 
   test("Test marking an item as incomplete", async () => {
     const agent = request.agent(server);
-    await login(agent, "testa123@gmail.com", "12345678");
+    await login(agent, "suraj123@gmail.com", "12345678");
     const getResponse = await agent.get("/todos");
     let csrfToken = fetchCsrfToken(getResponse);
     await agent.post("/todos").send({
