@@ -2,29 +2,34 @@
 /* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
+const csrf = require("tiny-csrf");
+
+const { Todo, User } = require("./models");
+
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const path = require("path");
-var csrf = require("tiny-csrf");
 
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
+
 const bcrypt = require("bcrypt");
-
 const saltRounds = 10;
-app.use(bodyParser.json());
 
-// seting the ejs is the engine
-app.set("view engine", "ejs");
+const flash = require("connect-flash");
 
 app.use(express.urlencoded({ extended: false }));
+const path = require("path");
 
+app.set("views", path.join(__dirname, "views"));
+app.use(flash());
+const user = require("./models/user");
+
+app.use(bodyParser.json());
 app.use(cookieParser("ssh!!!! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
-app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
@@ -37,6 +42,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
+});
+
 passport.use(
   new LocalStrategy(
     {
@@ -45,18 +55,19 @@ passport.use(
     },
     (username, password, done) => {
       User.findOne({ where: { email: username } })
-        .then(async (user) => {
+        .then(async function (user) {
           const result = await bcrypt.compare(password, user.password);
           if (result) {
             return done(null, user);
           } else {
-            return done("Invalid Password");
+            return done(null, false, { message: "Invalid Password" });
           }
           // eslint-disable-next-line no-unreachable
           return done(null, user);
         })
         .catch((error) => {
-          return error;
+          console.error(error);
+          return done(null, false, { message: "You are not registered" });
         });
     }
   )
@@ -77,7 +88,8 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-const { Todo, User } = require("./models");
+// seting the ejs is the engine
+app.set("view engine", "ejs");
 
 app.get("/", async (request, response) => {
   response.render("index", {
@@ -112,6 +124,8 @@ app.get(
   }
 );
 
+app.use(express.static(path.join(__dirname, "public")));
+
 //Signup page
 app.get("/signup", (request, response) => {
   response.render("signup", {
@@ -121,7 +135,20 @@ app.get("/signup", (request, response) => {
 });
 
 app.post("/users", async (request, response) => {
-  console.log("Firstname", request.body.firstName);
+  if (request.body.firstName.length == 0) {
+    request.flash("error", "Please enter your FirstName");
+    return response.redirect("/signup");
+  }
+  if (request.body.email.length == 0) {
+    request.flash("error", "Please enter your Email-address");
+    return response.redirect("/signup");
+  }
+  if (request.body.password.length < 8) {
+    request.flash("error", " Your password length should be atleast 8");
+    return response.redirect("/signup");
+  }
+  
+  console.log("FirstName", request.body.firstName);
   //Hash password using bcrypt
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
@@ -154,8 +181,11 @@ app.get("/login", (request, response) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
-  (request, response) => {
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  function(request, response) {
     console.log(request.user);
     response.redirect("/todos");
   }
@@ -179,6 +209,15 @@ app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    if (request.body.title.length == 0) {
+      request.flash("error", "Title won't be left empty!");
+      return response.redirect("/todos");
+    }
+    if (request.body.dueDate.length == 0) {
+      request.flash("error", "Due date won't be left empty!");
+      return response.redirect("/todos");
+    }
+
     console.log("Creating a To Do", request.body);
     console.log(request.user);
     try {
@@ -215,6 +254,7 @@ app.delete(
   "/todos/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
+    console.log("We have deleted Todo ID");
     const deleteFlag = await Todo.destroy({ where: { id: request.params.id } });
     response.send(deleteFlag ? true : false);
   }
