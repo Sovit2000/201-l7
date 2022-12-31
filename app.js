@@ -33,8 +33,8 @@ app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.use(
 session({
 secret: "my-super-secret-key-21728172615261562",
-resave: true,
-saveUninitialized: true,
+//resave: true,
+//saveUninitialized: true,
 cookie: {
 maxAge: 24 * 60 * 60 * 1000, //24hrs
 },
