@@ -136,7 +136,7 @@ app.get("/signup", (request, response) => {
   });
 });
 
-app.post("/users", async (request, response) => {
+app.post("/users", async function(request, response) {
   if (request.body.firstName.length == 0) {
     request.flash("error", "Please enter your FirstName");
     return response.redirect("/signup");
