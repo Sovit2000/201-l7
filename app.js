@@ -93,7 +93,7 @@ passport.deserializeUser((id, done) => {
 // seting the ejs is the engine
 app.set("view engine", "ejs");
 
-app.get("/", async (request, response) => {
+app.get("/", async function(request, response) {
   response.render("index", {
     title: "TO DO Application",
     csrfToken: request.csrfToken(),
@@ -103,7 +103,7 @@ app.get("/", async (request, response) => {
 app.get(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
+  async function(request, response) {
     const loggedInUser = request.user.id;
     const allTodos = await Todo.getTodos(loggedInUser);
     const overdue = await Todo.overdue(loggedInUser);
@@ -136,7 +136,7 @@ app.get("/signup", (request, response) => {
   });
 });
 
-app.post("/users", async function(request, response) {
+app.post("/users", async (request, response) => {
   if (request.body.firstName.length == 0) {
     request.flash("error", "Please enter your FirstName");
     return response.redirect("/signup");
@@ -165,11 +165,14 @@ app.post("/users", async function(request, response) {
     request.login(user, (err) => {
       if (err) {
         console.log(err);
-      }
-      response.redirect("/todos");
+        response.redirect("/");
+      }else{
+        response.redirect("/todos");
+      } 
     });
   } catch (error) {
-    console.log(error);
+    request.flash("error", error.message);
+    return response.redirect("/signup")
   }
 });
 
