@@ -11,7 +11,7 @@ const cookieParser = require("cookie-parser");
 
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
-const session = require("express-session");
+const session = require("cookie-session");
 const LocalStrategy = require("passport-local");
 
 const bcrypt = require("bcrypt");
