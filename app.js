@@ -30,6 +30,10 @@ app.use(bodyParser.json());
 app.use(cookieParser("ssh!!!! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
+var warning = 'Warning: connect.session() MemoryStore is not\n'
+  + 'designed for a production environment, as it will leak\n'
+  + 'memory, and will not scale past a single process.';
+
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
