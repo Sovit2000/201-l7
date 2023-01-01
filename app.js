@@ -35,8 +35,8 @@ app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
-    resave: false,
-    saveUninitialized: true,
+    //resave: false,
+    //saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
@@ -121,7 +121,7 @@ app.get(
       response.render("todos", {
         title: "TO_DO_Application",
         userName,
-        //allTodos,
+        allTodos,
         overdue,
         dueToday,
         dueLater,
@@ -217,12 +217,13 @@ app.post("/users", async (request, response) => {
         console.log(err);
         response.redirect("/");
       } else {
-        request.flash("success", "Sign up successfully")
+        //request.flash("success", "Sign up successfully");
         response.redirect("/todos");
       }
     })
   } catch (error) {
-    request.flash("error", "User already exist with this email");
+    request.flash("error", error.message);
+    //request.flash("error", "User already exist with this email");
     return response.redirect("/signup");
   }
 });
