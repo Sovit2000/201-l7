@@ -36,8 +36,8 @@ app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
-    resave: false,
-    saveUninitialized: true,
+    //resave: false,
+    //saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
@@ -49,9 +49,6 @@ app.use(passport.session());
 
 app.use(function (request, response, next) {
   response.locals.messages = request.flash();
-  if(!request.session){
-    return next(new Error('Oh no'))
-  }
   next();
 });
 
@@ -99,9 +96,12 @@ passport.deserializeUser((id, done) => {
 // seting the ejs is the engine
 app.set("view engine", "ejs");
 
-app.get("/", async function (request, response) {
+app.get("/", async(request, response) => {
+  if(request.user){
+    return response.redirect("/todos");
+  }
   response.render("index", {
-    title: "TO DO Application",
+    title: "TO_DO_Application",
     csrfToken: request.csrfToken(),
   });
 });
@@ -118,7 +118,7 @@ app.get(
     const completedItems = await Todo.completedItems(loggedInUser);
     if (request.accepts("html")) {
       response.render("todos", {
-        title: "TO DO Application",
+        title: "TO_DO_Application",
         allTodos,
         overdue,
         dueToday,
@@ -135,9 +135,9 @@ app.get(
 app.use(express.static(path.join(__dirname, "public")));
 
 //Signup page
-app.get("/signup", async function(request, response) {
+app.get("/signup",(request,response) => {
   response.render("signup", {
-    title: "Sign Up",
+    title: "Signup",
     csrfToken: request.csrfToken(),
   });
 });
@@ -152,7 +152,7 @@ app.post("/users", async (request, response) => {
     return response.redirect("/signup");
   }
   if (request.body.password.length < 8) {
-    request.flash("error", " Your password length should be atleast 8");
+    request.flash("error", " Password con not be empty");
     return response.redirect("/signup");
   }
 
@@ -168,16 +168,17 @@ app.post("/users", async (request, response) => {
       email: request.body.email,
       password: hashedPwd,
     });
-    request.login(user, (error) => {
-      if (error) {
-        console.log(error);
+    request.login(user, (err) => {
+      if (err) {
+        console.log(err);
         response.redirect("/");
       } else {
+        request.flash("success", "Sign up successfully")
         response.redirect("/todos");
       }
-    });
+    })
   } catch (error) {
-    request.flash("error", error.message);
+    request.flash("error", "User already exist with this email");
     return response.redirect("/signup");
   }
 });
@@ -188,7 +189,7 @@ app.get("/login", (request, response) => {
     title: "Login",
     csrfToken: request.csrfToken(),
   });
-});
+})
 
 app.post(
   "/session",
@@ -210,12 +211,13 @@ app.get("/signout", (request, response, next) => {
       return next(err);
     }
     response.redirect("/");
-  });
+  })
 });
 
 app.get("/todos", (request, response) => {
   console.log("Todo List", request.body);
 });
+
 app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
@@ -236,6 +238,7 @@ app.post(
       const todo = await Todo.addTodo({
         title: request.body.title,
         dueDate: request.body.dueDate,
+        completed: false,
         UserID: request.user.id,
       });
       return response.redirect("/todos");
