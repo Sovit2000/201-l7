@@ -21,7 +21,6 @@ const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-
 app.use(express.urlencoded({ extended: false }));
 const path = require("path");
 
