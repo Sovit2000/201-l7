@@ -168,9 +168,9 @@ app.post("/users", async (request, response) => {
       email: request.body.email,
       password: hashedPwd,
     });
-    request.login(user, (err) => {
-      if (err) {
-        console.log(err);
+    request.login(user, (error) => {
+      if (error) {
+        console.log(error);
         response.redirect("/");
       } else {
         response.redirect("/todos");
