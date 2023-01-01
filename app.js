@@ -13,7 +13,6 @@ const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const flash = require("connect-flash");
-//var session = require("cookie-session");
 
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
@@ -101,41 +100,6 @@ app.get("/", async(request, response) => {
   });
 });
 
-/*
-app.get(
-  "/todos",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
-    const loggedIn = request.user.id;
-    const userName =request.user.firstName+ "" +request.user.lastName;
-    const allTodos = await Todo.getTodos(loggedIn);
-    const overdue = await Todo.overdue(loggedIn);
-    const dueToday = await Todo.dueToday(loggedIn);
-    const dueLater = await Todo.dueLater(loggedIn);
-    const completedItems = await Todo.completedItems(loggedIn);
-    if (request.accepts("html")) {
-      response.render("todos", {
-        title: "TO_DO_Application",
-        userName,
-        allTodos,
-        overdue,
-        dueToday,
-        dueLater,
-        completedItems,
-        csrfToken: request.csrfToken(),
-      });
-    } else {
-      response.json({ 
-        allTodos, 
-        overdue, 
-        dueToday, 
-        dueLater
-       });
-    }
-  }
-);
-*/
-
 app.get(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
@@ -216,13 +180,13 @@ app.post("/users", async (request, response) => {
         console.log(err);
         response.redirect("/");
       } else {
-        //request.flash("success", "Sign up successfully");
+        request.flash("success", "Sign up successfully");
         response.redirect("/todos");
       }
     })
   } catch (error) {
     request.flash("error", error.message);
-    //request.flash("error", "User already exist with this email");
+    request.flash("error", "User already exist with this email");
     return response.redirect("/signup");
   }
 });
