@@ -111,6 +111,7 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
     const loggedInUser = request.user.id;
+    const userName =request.user.firstName+ "" + request.user.lastName;
     const allTodos = await Todo.getTodos(loggedInUser);
     const overdue = await Todo.overdue(loggedInUser);
     const dueToday = await Todo.dueToday(loggedInUser);
@@ -119,6 +120,7 @@ app.get(
     if (request.accepts("html")) {
       response.render("todos", {
         title: "TO_DO_Application",
+        userName,
         allTodos,
         overdue,
         dueToday,
