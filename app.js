@@ -109,14 +109,14 @@ app.get("/", async(request, response) => {
 app.get(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
-  async function (request, response) {
-    const loggedInUser = request.user.id;
-    const userName =request.user.firstName+ "" + request.user.lastName;
-    const allTodos = await Todo.getTodos(loggedInUser);
-    const overdue = await Todo.overdue(loggedInUser);
-    const dueToday = await Todo.dueToday(loggedInUser);
-    const dueLater = await Todo.dueLater(loggedInUser);
-    const completedItems = await Todo.completedItems(loggedInUser);
+  async (request, response) => {
+    const loggedIn = request.user.id;
+    const userName =request.user.firstName+ "" +request.user.lastName;
+    const allTodos = await Todo.getTodos(loggedIn);
+    const overdue = await Todo.overdue(loggedIn);
+    const dueToday = await Todo.dueToday(loggedIn);
+    const dueLater = await Todo.dueLater(loggedIn);
+    const completedItems = await Todo.completedItems(loggedIn);
     if (request.accepts("html")) {
       response.render("todos", {
         title: "TO_DO_Application",
