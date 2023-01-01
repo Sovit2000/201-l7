@@ -112,7 +112,7 @@ app.get(
   async (request, response) => {
     const loggedIn = request.user.id;
     const userName =request.user.firstName+ "" +request.user.lastName;
-    //const allTodos = await Todo.getTodos(loggedIn);
+    const allTodos = await Todo.getTodos(loggedIn);
     const overdue = await Todo.overdue(loggedIn);
     const dueToday = await Todo.dueToday(loggedIn);
     const dueLater = await Todo.dueLater(loggedIn);
@@ -130,7 +130,7 @@ app.get(
       });
     } else {
       response.json({ 
-        //allTodos, 
+        allTodos, 
         overdue, 
         dueToday, 
         dueLater
@@ -153,7 +153,7 @@ app.get(
       const completedItems = await Todo.completedItems(loggedIn);
       if (request.accepts("html")) {
         response.render("todos", {
-          title: "To-Do Manager",
+          title: "TO_DO_Apllication",
           userName,
           overdue,
           dueToday,
