@@ -106,6 +106,7 @@ app.get("/", async(request, response) => {
   });
 });
 
+/*
 app.get(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
@@ -135,6 +136,43 @@ app.get(
         dueToday, 
         dueLater
        });
+    }
+  }
+);
+*/
+
+app.get(
+  "/todos",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    try {
+      const loggedIn = request.user.id;
+      const userName = request.user.firstName + " " + request.user.lastName;
+      const overDue = await Todo.overdue(loggedIn);
+      const dueToday = await Todo.dueToday(loggedIn);
+      const dueLater = await Todo.dueLater(loggedIn);
+      const completedItems = await Todo.completedItems(loggedIn);
+      if (request.accepts("html")) {
+        response.render("todos", {
+          title: "To-Do Manager",
+          userName,
+          overdue,
+          dueToday,
+          dueLater,
+          completedItems,
+          csrfToken: request.csrfToken(),
+        });
+      } else {
+        response.json({
+          overdue,
+          dueToday,
+          dueLater,
+          completedItems,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      return response.status(422).json(err);
     }
   }
 );
