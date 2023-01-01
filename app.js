@@ -11,7 +11,9 @@ const cookieParser = require("cookie-parser");
 
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
-const session = require("express-session");
+//const session = require("express-session");
+var session = require("cookie-session");
+
 const LocalStrategy = require("passport-local");
 
 const bcrypt = require("bcrypt");
@@ -30,14 +32,10 @@ app.use(bodyParser.json());
 app.use(cookieParser("ssh!!!! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
-var warning = 'Warning: connect.session() MemoryStore is not\n'
-  + 'designed for a production environment, as it will leak\n'
-  + 'memory, and will not scale past a single process.';
-
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
