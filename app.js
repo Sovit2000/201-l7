@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 const express = require("express");
-const app = express;
+const app = express();
 const csrf = require("tiny-csrf");
 
 const { Todo, User } = require("./models");
