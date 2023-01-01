@@ -113,7 +113,7 @@ app.get(
     const loggedIn = request.user.id;
     const userName =request.user.firstName+ "" +request.user.lastName;
     const allTodos = await Todo.getTodos(loggedIn);
-    const overdue = await Todo.overdue(loggedIn);
+    //const overdue = await Todo.overdue(loggedIn);
     const dueToday = await Todo.dueToday(loggedIn);
     const dueLater = await Todo.dueLater(loggedIn);
     const completedItems = await Todo.completedItems(loggedIn);
@@ -121,7 +121,7 @@ app.get(
       response.render("todos", {
         title: "TO_DO_Application",
         userName,
-        allTodos,
+        //allTodos,
         overdue,
         dueToday,
         dueLater,
@@ -129,7 +129,12 @@ app.get(
         csrfToken: request.csrfToken(),
       });
     } else {
-      response.json({ allTodos, overdue, dueToday, dueLater });
+      response.json({ 
+        //allTodos, 
+        overdue, 
+        dueToday, 
+        dueLater
+       });
     }
   }
 );
