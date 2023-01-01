@@ -148,7 +148,7 @@ app.get(
     try {
       const loggedIn = request.user.id;
       const userName = request.user.firstName + " " + request.user.lastName;
-      const overDue = await Todo.overdue(loggedIn);
+      const overdue = await Todo.overdue(loggedIn);
       const dueToday = await Todo.dueToday(loggedIn);
       const dueLater = await Todo.dueLater(loggedIn);
       const completedItems = await Todo.completedItems(loggedIn);
