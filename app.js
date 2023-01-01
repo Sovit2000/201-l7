@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 const express = require("express");
-const app = express();
 const csrf = require("tiny-csrf");
 
 const { Todo, User } = require("./models");
@@ -14,11 +13,12 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 //var session = require("cookie-session");
 
-const LocalStrategy = require("passport-local");
+const app = express();
+app.set('trust proxy', 1);
 
+const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-
 const flash = require("connect-flash");
 
 app.use(express.urlencoded({ extended: false }));
