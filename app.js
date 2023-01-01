@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
+const flash = require("connect-flash");
 //var session = require("cookie-session");
 
 const app = express();
@@ -19,7 +20,7 @@ app.set('trust proxy', 1);
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const flash = require("connect-flash");
+
 
 app.use(express.urlencoded({ extended: false }));
 const path = require("path");
@@ -134,7 +135,7 @@ app.get(
 app.use(express.static(path.join(__dirname, "public")));
 
 //Signup page
-app.get("/signup", (request, response) => {
+app.get("/signup", async function(request, response) {
   response.render("signup", {
     title: "Sign Up",
     csrfToken: request.csrfToken(),
