@@ -48,6 +48,9 @@ app.use(passport.session());
 
 app.use(function (request, response, next) {
   response.locals.messages = request.flash();
+  if(!request.session){
+    return next(new Error('Oh no'))
+  }
   next();
 });
 
