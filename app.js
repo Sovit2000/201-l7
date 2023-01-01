@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 const express = require("express");
+const app = express;
 const csrf = require("tiny-csrf");
 
 const { Todo, User } = require("./models");
@@ -13,9 +14,6 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const flash = require("connect-flash");
 //var session = require("cookie-session");
-
-const app = express();
-app.set('trust proxy', 1);
 
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
@@ -66,8 +64,6 @@ passport.use(
           } else {
             return done(null, false, { message: "Invalid Password" });
           }
-          // eslint-disable-next-line no-unreachable
-          return done(null, user);
         })
         .catch((error) => {
           console.error(error);
@@ -145,16 +141,18 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
     try {
-      const loggedIn = request.user.id;
+      const loggedInUser = request.user.id;
       const userName = request.user.firstName + " " + request.user.lastName;
-      const overdue = await Todo.overdue(loggedIn);
-      const dueToday = await Todo.dueToday(loggedIn);
-      const dueLater = await Todo.dueLater(loggedIn);
-      const completedItems = await Todo.completedItems(loggedIn);
+      const allTodos = await Todo.getTodos(loggedInUser);
+      const overdue = await Todo.overdue(loggedInUser);
+      const dueToday = await Todo.dueToday(loggedInUser);
+      const dueLater = await Todo.dueLater(loggedInUser);
+      const completedItems = await Todo.completedItems(loggedInUser);
       if (request.accepts("html")) {
         response.render("todos", {
           title: "TO_DO_Apllication",
           userName,
+          allTodos,
           overdue,
           dueToday,
           dueLater,
@@ -163,6 +161,7 @@ app.get(
         });
       } else {
         response.json({
+          allTodos,
           overdue,
           dueToday,
           dueLater,
@@ -284,7 +283,7 @@ app.post(
         title: request.body.title,
         dueDate: request.body.dueDate,
         completed: false,
-        UserID: request.user.id,
+        userId: request.user.id,
       });
       return response.redirect("/todos");
     } catch (error) {
