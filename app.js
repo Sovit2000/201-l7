@@ -94,10 +94,12 @@ app.get("/", async(request, response) => {
   if(request.user){
     return response.redirect("/todos");
   }
-  response.render("index", {
-    title: "TO_DO_Application",
-    csrfToken: request.csrfToken(),
-  });
+  else{
+    response.render("index", {
+      title: "TO_DO_Application",
+      csrfToken: request.csrfToken(),
+   });
+  }
 });
 
 app.get(
@@ -121,6 +123,7 @@ app.get(
           dueToday,
           dueLater,
           completedItems,
+          user: request.user,
           csrfToken: request.csrfToken(),
         });
       } else {
@@ -159,7 +162,7 @@ app.post("/users", async (request, response) => {
     return response.redirect("/signup");
   }
   if (request.body.password.length < 8) {
-    request.flash("error", " Password con not be empty");
+    request.flash("error", " Password can't be empty");
     return response.redirect("/signup");
   }
 
@@ -278,7 +281,13 @@ app.delete(
   async function (request, response) {
     console.log("We have deleted Todo ID");
     const deleteFlag = await Todo.destroy({ where: { id: request.params.id } });
-    response.send(deleteFlag ? true : false);
+    if(deleteFlag === 0)
+    {
+      return response.send(false);
+    }
+    else{
+      response.send(true);
+    }
   }
 );
 

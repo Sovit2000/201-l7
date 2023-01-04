@@ -19,6 +19,7 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
           <%- include("header.ejs") %> 
+          <a class='text-green-700' href="/"><- Link to Go Home Page</a>
           <h6 class="py-4">Login with your account</h6>
           <form action="/session" method="post">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
