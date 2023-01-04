@@ -57,6 +57,9 @@
     <div class="grid grid-cols-6">
       <div class="col-start-3 col-span-2">
         <%- include("header.ejs") %>
+        <div>
+          <li> <%= messages.succes[i] %></li>
+        </div>
         <h1><%= "Welcome, " + user.firstName + " " + user.lastName %></h1>
           <a href="/signout"><b>Sign Out</b></a>
         <form action="/todos" method="post">
